@@ -2,14 +2,14 @@ package com.ecommerce.inventory.factory;
 
 import com.ecommerce.inventory.model.ProductBatch;
 import com.ecommerce.inventory.repository.ProductBatchRepository;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Component("defaultInventoryHandler")
 public class DefaultInventoryHandler implements InventoryHandler {
 
     @Override
-    @Transactional
     public Map<String, Object> reserve(ProductBatchRepository repository, Long productId, int quantity) {
         List<ProductBatch> batches = repository.findByProductIdOrderByExpiryDateAsc(productId);
         int remaining = quantity;
@@ -37,4 +37,3 @@ public class DefaultInventoryHandler implements InventoryHandler {
         return result;
     }
 }
-

@@ -1,5 +1,7 @@
 package com.ecommerce.inventory.controller;
 
+import com.ecommerce.inventory.model.BatchDto;
+import com.ecommerce.inventory.model.InventoryResponseDto;
 import com.ecommerce.inventory.model.ProductBatch;
 import com.ecommerce.inventory.service.InventoryService;
 import com.ecommerce.inventory.service.UpdateInventoryRequest;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/inventory")
@@ -26,10 +29,20 @@ public class InventoryController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<?> getBatches(@PathVariable Long productId) {
+    public ResponseEntity<?> getBatches(@PathVariable("productId") Long productId) {
         try {
             List<ProductBatch> batches = inventoryService.getBatchesForProduct(productId);
-            return ResponseEntity.ok(batches);
+            if (batches == null || batches.isEmpty()) {
+                // return an empty wrapped response
+                InventoryResponseDto empty = new InventoryResponseDto(productId, null, List.of());
+                return ResponseEntity.ok(empty);
+            }
+            String productName = batches.get(0).getProductName();
+            List<BatchDto> batchDtos = batches.stream()
+                    .map(b -> new BatchDto(b.getBatchId(), b.getQuantity(), b.getExpiryDate()))
+                    .collect(Collectors.toList());
+            InventoryResponseDto resp = new InventoryResponseDto(productId, productName, batchDtos);
+            return ResponseEntity.ok(resp);
         } catch (Exception ex) {
             log.error("Error fetching batches for product {}", productId, ex);
             Map<String, Object> err = new HashMap<>();

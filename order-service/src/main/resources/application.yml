@@ -18,6 +18,10 @@ logging:
   level:
     root: INFO
 
+inventory:
+  service:
+    url: http://localhost:8081
+
 management:
   endpoints:
     web:
