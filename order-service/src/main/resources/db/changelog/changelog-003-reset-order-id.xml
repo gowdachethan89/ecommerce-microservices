@@ -5,7 +5,10 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <include file="db/changelog/changelog-001-create-tables.xml"/>
-    <include file="db/changelog/changelog-002-data-load.xml"/>
+    <changeSet id="3" author="init">
+        <!-- For H2 set identity start to a value higher than any seeded order id to avoid collisions -->
+        <comment>Reset orders.order_id identity seed to 1000</comment>
+        <sql dbms="h2">ALTER TABLE orders ALTER COLUMN order_id RESTART WITH 1000;</sql>
+    </changeSet>
 
 </databaseChangeLog>

@@ -5,7 +5,11 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet id="2" author="data-load">
+    <changeSet id="5" author="fix">
+        <comment>Ensure orders.order_id identity restarts at 1000, clear existing orders and reload from CSV (without order_id) to avoid PK collisions</comment>
+        <!-- Ensure identity seed high enough before loading -->
+        <sql dbms="h2">ALTER TABLE orders ALTER COLUMN order_id RESTART WITH 1000;</sql>
+        <sql>DELETE FROM orders;</sql>
         <loadData file="classpath:db/changelog/data/orders.csv" separator="," tableName="orders">
             <column name="product_id" type="NUMERIC"/>
             <column name="product_name" type="STRING"/>
